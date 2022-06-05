@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, momentLocalizer  } from 'react-big-calendar'
 import moment, { months } from 'moment'
 
@@ -11,7 +11,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { CalendarModal } from './CalendarModal';
 import { useDispatch } from 'react-redux';
 import { uiOpenModal } from '../../actions/ui';
-import { eventClearActiveEvent, eventSetActive } from '../../actions/events';
+import { eventClearActiveEvent, eventSetActive, eventStartLoading } from '../../actions/events';
 import { useSelector } from 'react-redux';
 import AddNewFab from '../ui/AddNewFab';
 import DeleteEventFab from '../ui/DeleteEventFab';
@@ -25,9 +25,14 @@ const CalendarScreen = () => {
   const dispatch = useDispatch()
 
   const { events, activeEvent } = useSelector( state => state.calendar )
+  const { uid } = useSelector( state => state.auth )
 
   const [lastView, setlastView] = useState(localStorage.getItem('lastView') || 'month');
 
+  useEffect(() => {
+   dispatch( eventStartLoading() )
+  }, [dispatch])
+  
   const onDoubleClick = () => {
     console.log('abriendo modal');
     dispatch( uiOpenModal() )
@@ -47,9 +52,9 @@ const CalendarScreen = () => {
   }
 
   const eventStyleGetter = ( event, start, end, isSelected ) => {
-    
+
     const style = {
-      background:'#367CF7',
+      background: (uid === event.user._id) ? '#367CF7' : '#455660',
       borderRadius: '0px',
       opacity: 0.8,
       display: 'block',
